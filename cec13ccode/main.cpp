@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
+#include "test_func.h"
 
 //test_func(x, f, dimension,population_size,func_num);
 void test_func(double *, double *,int,int,int);
@@ -16,7 +17,7 @@ double *OShift,*M,*y,*z,*x_bound;
 int ini_flag=0,n_flag,func_flag;
 
 
-void main()
+int main()
 {
 	int i,j,k,n,m,func_num;
 	double *f,*x;
@@ -69,6 +70,7 @@ void main()
 	free(M);
 	free(OShift);
 	free(x_bound);
+	return 0;
 }
 
 
