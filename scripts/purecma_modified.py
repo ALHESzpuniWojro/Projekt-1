@@ -55,7 +55,7 @@ from math import log, exp
 from random import normalvariate as random_normalvariate
 
 # Wojciech imports
-from random import randrange
+import random
 
 try:
     from .interfaces import OOOptimizer, BaseDataLogger as _BaseDataLogger
@@ -71,11 +71,13 @@ __version__ = '3.0.0'
 __author__ = 'Nikolaus Hansen'
 __docformat__ = 'reStructuredText'
 
-
+# ps - population size in each of an interation
+# n - how many numbers will be compared
+# mi - how many 'winners' will be picked from the population
 def fmin(objective_fct, xstart, sigma,
          args=(),
          maxfevals='1e3 * N**2', ftarget=None,
-         verb_disp=100, verb_log=1, verb_save=1000):
+         verb_disp=100, verb_log=1, verb_save=1000, ps=7, n=2, mi=5):
     """non-linear non-convex minimization procedure, a functional
     interface to CMA-ES.
 
@@ -156,7 +158,7 @@ def fmin(objective_fct, xstart, sigma,
 
     :See: `CMAES`, `OOOptimizer`.
     """
-    es = CMAES(xstart, sigma, maxfevals=maxfevals, ftarget=ftarget)
+    es = CMAES(xstart, sigma, es_winners_number = mi, popsize=ps, maxfevals=maxfevals, ftarget=ftarget)
     if verb_log:  # prepare data logging
         es.logger = CMAESDataLogger(verb_log).add(es, force=True)
     someint=1
@@ -166,22 +168,47 @@ def fmin(objective_fct, xstart, sigma,
         if someint==1:
             print('Wylosowana populacja kandydatow: \n')
             print(X)
-            print('a teraz wartosci f celu dla kandydatow:\n')
+            print('Wartosci f celu dla kandydatow:\n')
             print(fit)
-            someint=someint+1
+            #someint=someint+1
 
         #########################################################################################
         #----------------------------- TU BEDZIE NASZA MODYFIKACJA -----------------------------#
         #########################################################################################
-        newX = []
-        #n how many numbers will be compared
-        for x in fit:
-            
-            random.sample(X, n)
-            newX.append(X[x])
-            s1=randrange()
+        # n - how many numbers will be compared
+        # mi - how many 'winners' will be picked from the population
 
-        es.tell(X, fit)  # update distribution parameters #aktualizuje parametry sciezki ewolucji
+        if mi > es.params.lam:
+            print ("Number of winners must be smaller or equal to number of population")
+            return
+
+        newX = []
+        newFit = []
+
+        for i in range(mi):
+            if (n>len(fit)):
+                fighters = fit
+            else:
+                fighters = random.sample(fit, n)
+            print(fighters)
+            print('\n')
+            fit_winner = min(fighters)
+            x_winner = X[fit.index(fit_winner)]
+            newFit.append(fit_winner)
+            newX.append(x_winner)
+            fit.remove(fit_winner)
+            X.remove(x_winner)
+
+        print("Dlugosc newX: \n")
+        print(len(newX))
+        print("newX: \n")
+        print(newX)
+        print("Dlugosc newFit: \n")
+        print(len(newFit))
+        print("newFit: \n")
+        print(newFit)
+
+        es.tell(newX, newFit, mi)  # update distribution parameters #aktualizuje parametry sciezki ewolucji
 
     # that's it! The remainder is managing output behavior only.
         es.disp(verb_disp)
@@ -209,7 +236,9 @@ class CMAESParameters(object):
 
     """
     default_popsize = '4 + int(3 * log(N))'
-    def __init__(self, N, popsize=None,
+
+    # Our modification winners_number
+    def __init__(self, N,  winners_number, popsize=None,
                  RecombinationWeights=None):
         """set static, fixed "strategy" parameters once and for all.
 
@@ -223,7 +252,11 @@ class CMAESParameters(object):
         self.lam = eval(safe_str(popsize if popsize else
                                  CMAESParameters.default_popsize,
                                  {'int': 'int', 'log': 'log', 'N': N}))
-        self.mu = int(self.lam / 2)  # number of parents/points/solutions for recombination
+        
+        # Our modification
+        self.mu = winners_number
+        #self.mu = int(self.lam / 2)  # number of parents/points/solutions for recombination
+        
         if RecombinationWeights:
             self.weights = RecombinationWeights(self.lam)
             self.mueff = self.weights.mueff
@@ -320,7 +353,8 @@ class CMAES(OOOptimizer):  # could also inherit from object
     :See: `fmin`, `OOOptimizer.optimize`
 
     """
-    def __init__(self, xstart, sigma,  # mandatory
+    # Our modification - es_winners_number
+    def __init__(self, xstart, sigma, es_winners_number ,  # mandatory
                  popsize=CMAESParameters.default_popsize,
                  ftarget=None,
                  maxfevals='100 * popsize + '  # 100 iterations plus...
@@ -351,7 +385,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         """
         # process some input parameters and set static parameters
         N = len(xstart)  # number of objective variables/problem dimension
-        self.params = CMAESParameters(N, popsize)
+        self.params = CMAESParameters(N, es_winners_number, popsize)
         self.maxfevals = eval(safe_str(maxfevals,
                                        known_words={'N': N, 'popsize': self.params.lam}))
         self.ftarget = ftarget  # stop if fitness <= ftarget
@@ -388,7 +422,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
             candidate_solutions.append(plus(self.xmean, y))
         return candidate_solutions
 
-    def tell(self, arx, fitvals):
+    def tell(self, arx, fitvals, mi):
         """update the evolution paths and the distribution parameters m,
         sigma, and C within CMA-ES.
 
@@ -406,7 +440,9 @@ class CMAES(OOOptimizer):  # could also inherit from object
         self.counteval += len(fitvals)  # evaluations used within tell
         N = len(self.xmean)
         par = self.params
-        xold = self.xmean  # not a copy, xmean is assigned anew later
+
+        ## Back to purecma code
+        xold = self.xmean  # not a copy, xmean is assigned a new later
 
         ### Sort by fitness
         arx = [arx[k] for k in argsort(fitvals)]  # sorted arx
@@ -437,7 +473,11 @@ class CMAES(OOOptimizer):  # could also inherit from object
         c1a = par.c1 * (1 - (1-hsig**2) * par.cc * (2-par.cc))
         self.C.multiply_with(1 - c1a - par.cmu * sum(par.weights))  # C *= 1 - c1 - cmu * sum(w)
         self.C.addouter(self.pc, par.c1)  # C += c1 * pc * pc^T, so-called rank-one update
-        for k, wk in enumerate(par.weights):  # so-called rank-mu update
+w        for k, wk in enumerate(par.weights):  # so-called rank-mu update
+            # Our modification
+            # Not sure if its correct yet
+            if k >= mi:
+                break
             if wk < 0:  # guaranty positive definiteness
                 wk *= N * (self.sigma / self.C.mahalanobis_norm(minus(arx[k], xold)))**2
             self.C.addouter(minus(arx[k], xold),  # C += wk * cmu * dx * dx^T
