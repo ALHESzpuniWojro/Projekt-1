@@ -473,7 +473,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         c1a = par.c1 * (1 - (1-hsig**2) * par.cc * (2-par.cc))
         self.C.multiply_with(1 - c1a - par.cmu * sum(par.weights))  # C *= 1 - c1 - cmu * sum(w)
         self.C.addouter(self.pc, par.c1)  # C += c1 * pc * pc^T, so-called rank-one update
-w        for k, wk in enumerate(par.weights):  # so-called rank-mu update
+        for k, wk in enumerate(par.weights):  # so-called rank-mu update
             # Our modification
             # Not sure if its correct yet
             if k >= mi:
