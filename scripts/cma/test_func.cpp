@@ -2,13 +2,28 @@
   CEC13 Test Function Suite 
   Jane Jing Liang (email: liangjing@zzu.edu.cn) 
   Last Modified on 14th Feb. 2013
+  https://github.com/P-N-Suganthan/CEC2013
 */
 
+/*
+  CEC13 Test Function Suite Boost Python Adapter
+  Wojciech Rokicki 
+*/
 
-#include <WINDOWS.H>      
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+//disable msvc warnings for Boost.Python (Boost 1.63)
+#pragma warning(disable:4100)
+#pragma warning(disable:4244)
+#endif
+
+#include <iostream>
+#include <list>
+#include <boost/python.hpp>
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
+using namespace boost;
+using namespace boost::python;   
 
 #define INF 1.0e99
 #define EPS 1.0e-14
@@ -31,7 +46,7 @@ void schwefel_func (double *, double *, int , double *,double *, int); /* Schwef
 void katsuura_func (double *, double *, int , double *,double *, int); /* Katsuura */
 void bi_rastrigin_func (double *, double *, int , double *,double *, int); /* Lunacek Bi_rastrigin */
 void grie_rosen_func (double *, double *, int , double *,double *, int); /* Griewank-Rosenbrock  */
-void escaffer6_func (double *, double *, int , double *,double *, int); /* Expanded Scaffer¡¯s F6  */
+void escaffer6_func (double *, double *, int , double *,double *, int); /* Expanded Scafferï¿½ï¿½s F6  */
 void step_rastrigin_func (double *, double *, int , double *,double *, int); /* Noncontinuous Rastrigin's  */
 void cf01 (double *, double *, int , double *,double *, int); /* Composition Function 1 */
 void cf02 (double *, double *, int , double *,double *, int); /* Composition Function 2 */
@@ -48,9 +63,13 @@ void asyfunc (double *, double *x, int, double);
 void oszfunc (double *, double *, int);
 void cf_cal(double *, double *, int, double *,double *,double *,double *,int);
 
-extern double *OShift,*M,*y,*z,*x_bound;;
-extern int ini_flag,n_flag,func_flag;
+//extern double *OShift,*M,*y,*z,*x_bound;
+//extern int ini_flag,n_flag,func_flag;
 
+double *OShift,*M,*y,*z,*x_bound;
+int ini_flag=0,n_flag,func_flag;
+
+//test_func(x, f, dimension,population_size,func_num);
 void test_func(double *x, double *f, int nx, int mx,int func_num)
 {
 	int cf_num=10,i;
@@ -65,7 +84,7 @@ void test_func(double *x, double *f, int nx, int mx,int func_num)
 	if (ini_flag==0)
 	{
 		FILE *fpt;
-		char FileName[30];
+		char FileName[80];
 		free(M);
 		free(OShift);
 		free(y);
@@ -81,7 +100,6 @@ void test_func(double *x, double *f, int nx, int mx,int func_num)
 		{
 			printf("\nError: Test functions are only defined for D=2,5,10,20,30,40,50,60,70,80,90,100.\n");
 		}
-		
 		sprintf(FileName, "input_data/M_D%d.txt", nx);
 		fpt = fopen(FileName,"r");
 		if (fpt==NULL)
@@ -94,7 +112,7 @@ void test_func(double *x, double *f, int nx, int mx,int func_num)
 			printf("\nError: there is insufficient memory available!\n");
 		for (i=0; i<cf_num*nx*nx; i++)
 		{
-				fscanf(fpt,"%Lf",&M[i]);
+				fscanf(fpt,"%lf",&M[i]);
 		}
 		fclose(fpt);
 		
@@ -109,7 +127,7 @@ void test_func(double *x, double *f, int nx, int mx,int func_num)
 			printf("\nError: there is insufficient memory available!\n");
 		for(i=0;i<cf_num*nx;i++)
 		{
-				fscanf(fpt,"%Lf",&OShift[i]);
+				fscanf(fpt,"%lf",&OShift[i]);
 		}
 		fclose(fpt);
 
@@ -250,7 +268,7 @@ void test_func(double *x, double *f, int nx, int mx,int func_num)
 void sphere_func (double *x, double *f, int nx, double *Os,double *Mr,int r_flag) /* Sphere */
 {
 	int i;
-	shiftfunc(x, y, nx, Os);
+	shiftfunc(x, y, nx, Os); // y is x shifted with an Os
 	if (r_flag==1)
 	rotatefunc(y, z, nx, Mr);
 	else
@@ -783,7 +801,7 @@ void grie_rosen_func (double *x, double *f, int nx, double *Os,double *Mr,int r_
 }
 
 
-void escaffer6_func (double *x, double *f, int nx, double *Os,double *Mr,int r_flag) /* Expanded Scaffer¡¯s F6  */
+void escaffer6_func (double *x, double *f, int nx, double *Os,double *Mr,int r_flag) /* Expanded Scafferï¿½ï¿½s F6  */
 {
     int i;
     double temp1, temp2;
@@ -1082,3 +1100,79 @@ void cf_cal(double *x, double *f, int nx, double *Os,double * delta,double * bia
 	free(w);
 }
 
+void initModule() {
+	//std::cout << "init module" << std::endl;
+}
+
+class X {
+public:
+	X(){
+		//std::cout << "Object X created" << std::endl;
+		x = nullptr;
+		f = nullptr;
+	}
+	~X(){
+		free(x);
+		free(f);
+	}
+	// pass population vector in the following form [x11,x12,x21,x22,x31, x32]
+	// example for 3 population size and 2nd dimension
+	// m - population size, n - dimension, fn - number of testing function (1-28)
+	void set(list l, int m, int n, int fn){
+		int i, length;
+		
+		length = len(wfc);
+		for (i = 0; i < length; i++){
+			wfc.pop();
+		}
+		
+		free(x);
+		free(f);
+		x=(double *)malloc(m*n*sizeof(double));
+		f=(double *)malloc(sizeof(double)  *  m);
+		
+
+		m_ = m;
+		n_ = n;
+
+		length = len(l);
+		for(i = 0; i < length; i++){
+			auto k = l.pop(0);
+			x[i] = extract<double>(k);
+		}
+
+		// test_func(x, f, dimension,population_size,func_num);
+		test_func(x, f, n_, m_, fn);
+
+		
+		/*for (i = 0; i < m; i++){
+			std::cout << "For the population no. " << i << "target function = " << f[i] << '\n';
+		}*/
+	}
+	// creates and returns list of target function values for the population
+	list get() { 
+		if(f!=nullptr){
+			for (int i = 0; i < m_; i++){
+				wfc.append(f[i]);
+			}
+		}
+		return wfc;
+	}
+private:
+	double* x;
+	double* f;
+	int m_;
+	int n_;
+	list wfc;
+};
+
+BOOST_PYTHON_MODULE(test_func)
+{
+    initModule();
+
+	class_<X>("X", init<>() )
+        .def( "get", &X::get )
+		.def( "set", &X::set )
+        ;
+
+}
