@@ -203,7 +203,7 @@ def fmin(no, xstart, sigma,
         # worst observed value
         worst = sorted(fit)[len(fit)-1]
 
-        print(X)
+        #print(X)
 
         for i in range(len(X)):
             outsider = False
@@ -268,28 +268,26 @@ def fmin(no, xstart, sigma,
 
     if verb_disp:  # do not print by default to allow silent verbosity
         es.disp(1)
+        output.write('Starting point = ' + str(xstart) + '\n')
+        print('Starting point = ', xstart)
         output.write('Population size = ' + str(ps) + '\n')
         print('Population size = ', ps)
         output.write('Dimension = ' + str(dim) + '\n')
         print('Dimension = ', dim)
-        if(n!=2):
-            output.write('Tournament size = ' + str(n) + '\n')
-            print('Tournament size = ', n)
-        else:
-            output.write('Pairs comaparison\n')
-            print('Pairs comaparison')
+        output.write('Tournament size = ' + str(n) + '\n')
+        print('Tournament size = ', n)
         output.write('\"Winners" number = ' + str(mi) + '\n')
         print('\"Winners" number = ', mi)
         output.write('CEC test function number = ' + str(fn) + '\n')
         print('CEC test function number = ', fn)
-        output.write('Termination by' + str(es.stop()) + '\n')
-        print('Termination by', es.stop())
-        output.write('Iterations =' + str(iterations) + '\n')
+        output.write('Termination by ' + str(es.stop()) + '\n')
+        print('Termination by ', es.stop())
+        output.write('Iterations = ' + str(iterations) + '\n')
         print('Iterations =', iterations)
-        output.write('Best f-value =' + str(es.result[1]) + '\n')
-        print('Best f-value =', es.result[1])
-        output.write('Solution =' + str(es.result[0]) + '\n')
-        print('Solution =', es.result[0])
+        output.write('Best f-value = ' + str(es.result[1]) + '\n')
+        print('Best f-value = ', es.result[1])
+        output.write('Solution = ' + str(es.result[0]) + '\n')
+        print('Solution = ', es.result[0])
         print("------------------------------")
     if verb_log:
         es.logger.add(es, force=True)
