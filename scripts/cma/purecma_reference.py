@@ -161,14 +161,14 @@ def fmin(no, xstart, sigma,
 
     :See: `CMAES`, `OOOptimizer`.
     """
-    name2 ='result_out_mod/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
+    name2 ='result_out_ref/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
     global output
     output = open(name2, 'w')
 
     es = CMAES(no, xstart, sigma, es_winners_number = mi, popsize=ps, tourcand=n, cecfn=fn, maxfevals=maxfevals, ftarget=ftarget)
 
     if verb_log:  # prepare data logging
-        name ='data_out_mod/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
+        name ='data_out_ref/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
         es.logger = CMAESDataLogger(name, verb_log).add(es, force=True)
 
     iterations = 0
@@ -203,8 +203,6 @@ def fmin(no, xstart, sigma,
         # worst observed value
         worst = sorted(fit)[len(fit)-1]
 
-        print(X)
-
         for i in range(len(X)):
             outsider = False
             dev = 0
@@ -215,43 +213,9 @@ def fmin(no, xstart, sigma,
             if(outsider == True):
                 fit[i] = dev + worst
 
-
-        #########################################################################################
-        #--------------------------- OUR MODIFICATION - TOURNAMENTS ----------------------------#
-        #########################################################################################
-        # n - how many candidates will be tournamented
-        # mi - how many 'winners' will be picked from the population
-
-        if mi > es.params.lam:
-            print ("Number of winners must be smaller or equal to number of population!")
-            return
-
-        newX = []
-        newFit = []
-
-        for i in range(mi):
-            if (n>len(fit)):
-                fighters = fit
-            else:
-                fighters = random.sample(fit, n)
-            #print(fighters)
-            #print('\n')
-            fit_winner = min(fighters)
-            x_winner = X[fit.index(fit_winner)]
-            newFit.append(fit_winner)
-            newX.append(x_winner)
-            #fit.remove(fit_winner)
-            #X.remove(x_winner)
-        '''
-        print("Length of newX: \n")
-        print(len(newX))
-        print("newX: \n")
-        print(newX)
-        print("Length of newFit: \n")
-        print(len(newFit))
-        print("newFit: \n")
-        print(newFit)
-        '''
+        newX = [X[k] for k in argsort(fit)]
+        newX = newX[0:mi]
+        newFit = sorted(fit)[0:mi]
 
         es.tell(newX, newFit, mi)  # update distribution parameters
 
@@ -458,7 +422,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         self.randn = randn
 
         # Modification
-        name ='data_out_mod/' + str(no) + '_dim_' + str(N) + '_cec_' + str(cecfn) + '_tourcand_' + str(tourcand) + '_data'
+        name ='data_out_ref/' + str(no) + '_dim_' + str(N) + '_cec_' + str(cecfn) + '_tourcand_' + str(tourcand) + '_data'
         self.popsz = popsize
 
         # initializing dynamic state variables

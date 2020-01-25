@@ -1,2 +1,6 @@
 _CMAESDataLogger_datadict.py
 outcmaes/*
+data_out_mod/*
+result_out_mod/*
+data_out_ref/*
+result_out_ref/*
