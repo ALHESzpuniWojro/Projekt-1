@@ -5,9 +5,9 @@ e = Environment()
 if(platform.system() == "Linux"):
    e.Append( CPPFLAGS = '-Wall -pedantic -pthread -Wno-long-long' )
    e.Append( LINKFLAGS = '-Wall -pthread' )
-   e.Append( CPPPATH = ['/usr/include/python2.7'] )
-   e.Append( LIBPATH = ['/usr/lib/python2.7'] )
-   e.Append( LIBS = [ 'boost_python' ] )
+   e.Append( CPPPATH = ['/usr/local/include','/usr/include/python2.7'] )
+   e.Append( LIBPATH = ['/usr/local/lib'] )
+   e.Append( LIBS = [ 'boost_python27' ] )
 
    target = 'test_func.so'
 elif(platform.system() == "Windows"):

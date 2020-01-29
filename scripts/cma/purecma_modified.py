@@ -824,8 +824,8 @@ class CMAESDataLogger(_BaseDataLogger):  # could also inherit from object
 
     def save(self, name=None):
         """save data to file `name` or ``self.filename``"""
-        with open(name or self.filename, 'w') as f:
-            f.write(repr(self._data))
+        #with open(name or self.filename, 'w') as f:
+        #    f.write(repr(self._data))
 
     def load(self, name=None):
         """load data from file `name` or ``self.filename``"""

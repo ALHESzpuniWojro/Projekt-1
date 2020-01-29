@@ -26,3 +26,10 @@ Installing components were the same.
 
 ## Executing
 Simply run `purecma_mod_sim.py` for tournament modification or `purecma_ref_sim.py` for reference cma (half winners from sorting by tfvalue).
+
+## What could be done better?
+- Multithreading
+- Code optimalization
+- Plotting
+- Installation process (some problems with bash)
+- Data backup
