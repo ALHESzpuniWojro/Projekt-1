@@ -29,6 +29,23 @@ mean_solution = ''
 mean_solution = content[len(content)-1]
 print(mean_solution[mean_solution.find("=")+2:len(mean_solution)])
 
+TERMINATIONS = ['maxfevals', 'condition', 'tolfun']
+
+reason_line = content[len(content) - 4]
+reason = ''
+for t in TERMINATIONS:
+    if t in reason_line:
+        reason = t
+        break
+
+print(reason)
+
+solution_line = content[len(content) - 1]
+solution_str = solution_line[solution_line.find("=") + 2:len(solution_line)]
+solution = eval(solution_str)
+
+print(solution[0])
+
 rfile.close()
 
 # if l[0] == 'e' then ... , if l[0] == 'S' then ...
@@ -42,8 +59,9 @@ wfile.write(mean_fvalue[mean_fvalue.find("=")+2:len(mean_fvalue)])
 wfile.write(mean_solution[mean_solution.find("=")+2:len(mean_solution)])
 wfile.close()
 
+'''
 # For reference results
-'''dim = 5
+dim = 5
 for i in range(1, 29): # for every CEC test function 1-28 (i)
     for k in range(51): # for every point
         filename = str(k) + "_dim_" + str(dim) + "_cec_" + i + "_tourcand_2_data"
