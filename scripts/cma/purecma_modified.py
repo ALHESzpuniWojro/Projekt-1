@@ -172,6 +172,7 @@ def fmin(no, xstart, sigma,
         es.logger = CMAESDataLogger(name, verb_log).add(es, force=True)
 
     iterations = 0
+    f_worst = True
 
     while not es.stop():
         X = es.ask()  # gets a list of sampled candidate solutions
@@ -196,12 +197,18 @@ def fmin(no, xstart, sigma,
         tf.set(X2, ps, dim, fn)
         fit = tf.get()
 
+        #print(fit)
+        #print("------------------------------------------------")
+
         #########################################################################################
         #------------------------- OUR MODIFICATION - PENALTY FUNCTION -------------------------#
         #########################################################################################
 
         # worst observed value
-        worst = sorted(fit)[len(fit)-1]
+        if (f_worst==True) :
+            worst = sorted(fit)[len(fit)-1]
+        elif (worst < sorted(fit)[len(fit)-1]):
+            worst = sorted(fit)[len(fit)-1]
 
         #print(X)
 
@@ -252,6 +259,9 @@ def fmin(no, xstart, sigma,
         print("newFit: \n")
         print(newFit)
         '''
+
+        #print(newFit)
+        #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
         es.tell(newX, newFit, mi)  # update distribution parameters
 
