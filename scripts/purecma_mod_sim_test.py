@@ -13,25 +13,25 @@ from numpy.random import uniform
          verb_disp=100, verb_log=1, verb_save=1000, ps=7, n=2, mi=5, fn=1):'''
 dim = 5
 for i in range(1, 29): # for every CEC test function 1-28 (i)
-    for j in range(2, 9):
+    for j in range(1, 9):
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified_test.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
 dim = 10
 for i in range(1, 29): # for every CEC test function 1-28 (i)
-    for j in range(2, 9):
+    for j in range(1, 9):
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified_test.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
 dim = 20
 for i in range(1, 29): # for every CEC test function 1-28 (i)
-    for j in range(2, 9):
+    for j in range(1, 9):
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified_test.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
 dim = 30
 for i in range(1, 29): # for every CEC test function 1-28 (i)
-    for j in range(2, 9):
+    for j in range(1, 9):
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified_test.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
