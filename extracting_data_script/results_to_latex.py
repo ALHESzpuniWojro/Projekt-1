@@ -2,12 +2,6 @@ import re
 import statistics
 
 
-'''
-DIM_30_MOD = 'all_results\\dim_30_mod\\'
-DIM_30_REF = 'all_results\\dim_30_ref\\'
-DIMS_MOD = 'all_results\\dims_mod\\'
-DIMS_REF = 'all_results\\dims_ref\\'
-'''
 
 PATH_MOD = 'home\\wojciech\\Desktop\\all_data\\result_out_mod\\'
 PATH_REF = 'home\\wojciech\\Desktop\\all_data\\result_out_ref\\'
@@ -24,10 +18,16 @@ for i in range(1,29):
 
 filenames = []
 
+
+
+
+
 def process_data(filename, iteration_arr, fvalue_arr, termination_arr, solution_arr):
     try:
         rfile = open(filename, "r")
+
         filenames.append(filename)
+
     except FileNotFoundError:
         return
     content = rfile.readlines()
@@ -77,7 +77,6 @@ def process_data(filename, iteration_arr, fvalue_arr, termination_arr, solution_
     #return mean_iterations, mean_fvalue
 
 
-
 dim = 5
 dim5_fvalue_arr = []
 dim5_termination_arr = []
@@ -91,7 +90,9 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_sol_arr = []
 
     for k in range(51):  # for every point
+
         filename = PATH_REF + str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_2_data"
+
         process_data(filename, iteration_arr=cec_iter_arr, fvalue_arr=cec_fvalue_arr, termination_arr=cec_term_arr,
                      solution_arr=cec_sol_arr)
 
@@ -99,6 +100,7 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     dim5_termination_arr.append(cec_term_arr)
     dim5_solution_arr.append(cec_sol_arr)
     dim5_iteration_arr.append(cec_iter_arr)
+
 
 
 
@@ -115,7 +117,9 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_sol_arr = []
 
     for k in range(51):  # for every point
+
         filename = PATH_REF + str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_2_data"
+
         process_data(filename, iteration_arr=cec_iter_arr, fvalue_arr=cec_fvalue_arr, termination_arr=cec_term_arr,
                      solution_arr=cec_sol_arr)
 
@@ -139,7 +143,9 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_sol_arr = []
 
     for k in range(51):  # for every point
+
         filename = PATH_REF + str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_2_data"
+
         process_data(filename, iteration_arr=cec_iter_arr, fvalue_arr=cec_fvalue_arr, termination_arr=cec_term_arr,
                      solution_arr=cec_sol_arr)
 
@@ -162,7 +168,9 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_sol_arr = []
 
     for k in range(51):  # for every point
+
         filename = PATH_REF + str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_2_data"
+
         process_data(filename, iteration_arr=cec_iter_arr, fvalue_arr=cec_fvalue_arr, termination_arr=cec_term_arr,
                      solution_arr=cec_sol_arr)
 
@@ -187,13 +195,17 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_iter_arr = []
     cec_term_arr = []
     cec_sol_arr = []
+
     for j in range(1, 9):  # for every size of tournament
+
         tour_fvalue_arr = []
         tour_iter_arr = []
         tour_term_arr = []
         tour_sol_arr = []
         for k in range(51):  # for every point
+
             filename = PATH_MOD +str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_" + str(j) + "_data"
+
             process_data(filename, iteration_arr=tour_iter_arr, fvalue_arr=tour_fvalue_arr, termination_arr=tour_term_arr,
                          solution_arr=tour_sol_arr)
         cec_fvalue_arr.append(tour_fvalue_arr)
@@ -217,13 +229,17 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_iter_arr = []
     cec_term_arr = []
     cec_sol_arr = []
+
     for j in range(1, 9):  # for every size of tournament
+
         tour_fvalue_arr = []
         tour_iter_arr = []
         tour_term_arr = []
         tour_sol_arr = []
         for k in range(51):  # for every point
+
             filename = PATH_MOD +str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_" + str(j) + "_data"
+
             process_data(filename, iteration_arr=tour_iter_arr, fvalue_arr=tour_fvalue_arr, termination_arr=tour_term_arr,
                          solution_arr=tour_sol_arr)
         cec_fvalue_arr.append(tour_fvalue_arr)
@@ -247,13 +263,17 @@ for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_iter_arr = []
     cec_term_arr = []
     cec_sol_arr = []
+
     for j in range(1, 9):  # for every size of tournament
+
         tour_fvalue_arr = []
         tour_iter_arr = []
         tour_term_arr = []
         tour_sol_arr = []
         for k in range(51):  # for every point
+
             filename = PATH_MOD +str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_" + str(j) + "_data"
+
             process_data(filename, iteration_arr=tour_iter_arr, fvalue_arr=tour_fvalue_arr, termination_arr=tour_term_arr,
                          solution_arr=tour_sol_arr)
         cec_fvalue_arr.append(tour_fvalue_arr)
@@ -273,18 +293,20 @@ m_dim30_termination_arr = []
 m_dim30_solution_arr = []
 m_dim30_iteration_arr = []
 
-
 for i in range(1, 29):  # for every CEC test function 1-28 (i)
     cec_fvalue_arr = []
     cec_iter_arr = []
     cec_term_arr = []
     cec_sol_arr = []
+
     for j in range(1, 9):  # for every size of tournament
+
         tour_fvalue_arr = []
         tour_iter_arr = []
         tour_term_arr = []
         tour_sol_arr = []
         for k in range(51):  # for every point
+
             filename = PATH_MOD +str(k) + "_dim_" + str(dim) + "_cec_" + str(i) + "_tourcand_" + str(j) + "_data"
 
             process_data(filename, iteration_arr=tour_iter_arr, fvalue_arr=tour_fvalue_arr, termination_arr=tour_term_arr,
@@ -321,7 +343,8 @@ MOD_SOLUTIONS = [m_dim5_solution_arr, m_dim10_solution_arr, m_dim20_solution_arr
 NUM_OF_COLLUMS = 12
 REF_COLLUMNS = 5
 MOD_COLLUMNS = 6
-'''
+
+
 f= open("RESULTS.txt","w+")
 
 OUTPUT = ''
@@ -373,6 +396,7 @@ OUTPUT = ''
 NUM_OF_COLLUMS = 5
 i = 2
 for dim in [20]:
+
     output_str = '\\begin{table}[H] \n' \
                  '\\centering \n' \
                  '\\begin{adjustbox}{width=1\\textwidth}\n' \
@@ -395,8 +419,6 @@ for dim in [20]:
             else:
                 output_str += ' \\\\ \n'
 
-
-
     output_str += '\\hline ' \
                   '\\end{tabular}\\end{adjustbox}\n' \
                   '\\end{table}\n'
@@ -406,10 +428,12 @@ print(OUTPUT)
 '''
 
 
+
 OUTPUT = ''
 NUM_OF_COLLUMS = 5
 i = 2
 for dim in [20, 30]:
+
     output_str = '\\begin{table}[H] \n' \
                  '\\centering \n' \
                  '\\begin{adjustbox}{width=1\\textwidth}\n' \
@@ -437,6 +461,9 @@ for dim in [20, 30]:
     output_str += '\\hline ' \
                   '\\end{tabular}\\end{adjustbox}\n' \
                   '\\end{table}\n'
+
     i += 1
     OUTPUT += output_str
 print(OUTPUT)
+'''
+

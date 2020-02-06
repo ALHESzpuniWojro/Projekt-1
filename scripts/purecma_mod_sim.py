@@ -18,7 +18,6 @@ for i in range(1, 29): # for every CEC test function 1-28 (i)
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
-'''
 dim = 10
 for i in range(14, 29): # for every CEC test function 1-28 (i)
     for j in range(2, 7):
@@ -31,11 +30,11 @@ for i in range(1, 29): # for every CEC test function 1-28 (i)
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
+'''
 dim = 30
 for i in range(1, 29): # for every CEC test function 1-28 (i)
-    for j in range(2, 7):
+    for j in range(5, 7):
         for k in range(51):
             x = uniform(low=-80, high=80, size=(dim,))
             purecma_modified.fmin(no = k, xstart = x, sigma = 20/3, ps = 4*dim, n = j, mi = 2*dim, fn = i)
-
 #res[1].logger.plot()  # needs pylab/matplotlib to be installed

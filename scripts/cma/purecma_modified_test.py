@@ -161,14 +161,14 @@ def fmin(no, xstart, sigma,
 
     :See: `CMAES`, `OOOptimizer`.
     """
-    name2 ='result_out_ref/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
+    name2 ='result_out_mod/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
     global output
     output = open(name2, 'w')
 
     es = CMAES(no, xstart, sigma, es_winners_number = mi, popsize=ps, tourcand=n, cecfn=fn, maxfevals=maxfevals, ftarget=ftarget)
 
     if verb_log:  # prepare data logging
-        name ='data_out_ref/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
+        name ='data_out_mod/' + str(no) + '_dim_' + str(len(xstart)) + '_cec_' + str(fn) + '_tourcand_' + str(n) + '_data'
         es.logger = CMAESDataLogger(name, verb_log).add(es, force=True)
 
     iterations = 0
@@ -197,6 +197,12 @@ def fmin(no, xstart, sigma,
         tf.set(X2, ps, dim, fn)
         fit = tf.get()
 
+        #print("wylosowana populacja")
+        #print(X)
+        #print("wartosci f celu")
+        #print(fit)
+        #print("------------------------------------------------")
+
         #########################################################################################
         #------------------------- OUR MODIFICATION - PENALTY FUNCTION -------------------------#
         #########################################################################################
@@ -204,8 +210,12 @@ def fmin(no, xstart, sigma,
         # worst observed value
         if (f_worst==True) :
             worst = sorted(fit)[len(fit)-1]
+            f_worst = False
         elif (worst < sorted(fit)[len(fit)-1]):
             worst = sorted(fit)[len(fit)-1]
+
+        #print("najgorszy zaobserwowany")
+        #print(worst)
 
         for i in range(len(X)):
             outsider = False
@@ -217,8 +227,97 @@ def fmin(no, xstart, sigma,
             if(outsider == True):
                 fit[i] = dev + worst
 
-        newX = [X[k] for k in argsort(fit)]
-        newFit = sorted(fit)
+        #print("wartosci f celu po f kary")
+        #print(fit)
+
+        #########################################################################################
+        #--------------------------- OUR MODIFICATION - TOURNAMENTS ----------------------------#
+        #########################################################################################
+        # n - how many candidates will be tournamented
+        # mi - how many 'winners' will be picked from the population
+
+        if mi > es.params.lam:
+            print ("Number of winners must be smaller or equal to number of population!")
+            return
+
+        newX = []
+        newFit = []
+
+        fitm = fit
+        Xm = X
+        if (n!=1):
+            for i in range(mi):
+                if (n>len(fit)):
+                    fighters = fit
+                else:
+                    fighters = random.sample(fit, n)
+                #print("wojownicy")
+                #print(fighters)
+                #print('\n')
+                fit_winner = min(fighters)
+                #print("zwyciezca")
+                #print(fit_winner)
+                #print(fit.index(fit_winner))
+                x_winner = X[fit.index(fit_winner)]
+                #print(x_winner)
+                newFit.append(fit_winner)
+                newX.append(x_winner)
+                #print(X)
+                #fitm.remove(fit_winner) # it was deleting elements from fit as well (kinda pointer)
+                #Xm.remove(x_winner)
+        else:
+            x1 = X[:mi]
+            fx1 = fit[:mi]
+            x2 = X[mi:len(X)]
+            fx2 = fit[mi:len(fit)]
+            for i in range(mi):
+                if fx1[i]<fx2[i]:
+                    newFit.append(fx1[i])
+                    newX.append(x1[i])
+                else:
+                    newFit.append(fx2[i])
+                    newX.append(x2[i])
+
+        newX = [newX[k] for k in argsort(newFit)]
+        newFit = sorted(newFit)
+
+        #print("sort zwyciezcy")
+        #print(newX)
+        #print("sort zwyciezcy f celu")
+        #print(newFit)
+
+        Xm = [Xm[k] for k in argsort(fitm)]
+        fitm = sorted(fitm)
+
+        #print("reszta")
+        #print(Xm)
+        #print("reszta f celu")
+        #print(fitm)
+
+        for p in range(mi, len(Xm)):
+            newX.append(Xm[p])
+        for p in range(mi, len(fitm)):
+            newFit.append(fitm[p])
+
+        #print("do adaptacji")
+        #print(newX)
+        #print("do adaptacji f celu")
+        #print(newFit) 
+        '''
+        print("Length of newX: \n")
+        print(len(newX))
+        print("newX: \n")
+        print(newX)
+        print("Length of newFit: \n")
+        print(len(newFit))
+        print("newFit: \n")
+        print(newFit)
+        '''
+
+        #print(es.params.weights)
+
+        #print(newFit)
+        #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
         es.tell(newX, newFit, mi)  # update distribution parameters
 
@@ -241,6 +340,8 @@ def fmin(no, xstart, sigma,
         print('Population size = ', ps)
         output.write('Dimension = ' + str(dim) + '\n')
         print('Dimension = ', dim)
+        output.write('Tournament size = ' + str(n) + '\n')
+        print('Tournament size = ', n)
         output.write('\"Winners" number = ' + str(mi) + '\n')
         print('\"Winners" number = ', mi)
         output.write('CEC test function number = ' + str(fn) + '\n')
@@ -248,7 +349,7 @@ def fmin(no, xstart, sigma,
         output.write('Termination by ' + str(es.stop()) + '\n')
         print('Termination by ', es.stop())
         output.write('Iterations = ' + str(iterations) + '\n')
-        print('Iterations = ', iterations)
+        print('Iterations =', iterations)
         output.write('Best f-value = ' + str(es.result[1]) + '\n')
         print('Best f-value = ', es.result[1])
         output.write('Solution = ' + str(es.result[0]) + '\n')
@@ -421,7 +522,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         self.randn = randn
 
         # Modification
-        name ='data_out_ref/' + str(no) + '_dim_' + str(N) + '_cec_' + str(cecfn) + '_tourcand_' + str(tourcand) + '_data'
+        name ='data_out_mod/' + str(no) + '_dim_' + str(N) + '_cec_' + str(cecfn) + '_tourcand_' + str(tourcand) + '_data'
         self.popsz = popsize
 
         # initializing dynamic state variables
@@ -478,8 +579,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         xold = self.xmean  # not a copy, xmean is assigned a new later
 
         ### Sort by fitness
-        arx = [arx[k] for k in argsort(fitvals)]  # sorted arx
-        self.fitvals = sorted(fitvals)  # used for termination and display only
+        self.fitvals = fitvals  # used for termination and display only
         self.best.update(arx[0], self.fitvals[0], self.counteval)
 
         ### recombination, compute new weighted mean value

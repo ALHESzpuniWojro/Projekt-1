@@ -197,6 +197,12 @@ def fmin(no, xstart, sigma,
         tf.set(X2, ps, dim, fn)
         fit = tf.get()
 
+        #print("wylosowana populacja")
+        #print(X)
+        #print("wartosci f celu")
+        #print(fit)
+        #print("------------------------------------------------")
+
         #########################################################################################
         #------------------------- OUR MODIFICATION - PENALTY FUNCTION -------------------------#
         #########################################################################################
@@ -204,8 +210,12 @@ def fmin(no, xstart, sigma,
         # worst observed value
         if (f_worst==True) :
             worst = sorted(fit)[len(fit)-1]
+            f_worst = False
         elif (worst < sorted(fit)[len(fit)-1]):
             worst = sorted(fit)[len(fit)-1]
+
+        #print("najgorszy zaobserwowany")
+        #print(worst)
 
         for i in range(len(X)):
             outsider = False
@@ -216,6 +226,10 @@ def fmin(no, xstart, sigma,
                     dev += (abs(X[i][j])-80)**2
             if(outsider == True):
                 fit[i] = dev + worst
+
+        if mi > es.params.lam:
+            print ("Number of winners must be smaller or equal to number of population!")
+            return
 
         newX = [X[k] for k in argsort(fit)]
         newFit = sorted(fit)
@@ -241,6 +255,8 @@ def fmin(no, xstart, sigma,
         print('Population size = ', ps)
         output.write('Dimension = ' + str(dim) + '\n')
         print('Dimension = ', dim)
+        output.write('Tournament size = ' + str(n) + '\n')
+        print('Tournament size = ', n)
         output.write('\"Winners" number = ' + str(mi) + '\n')
         print('\"Winners" number = ', mi)
         output.write('CEC test function number = ' + str(fn) + '\n')
@@ -248,7 +264,7 @@ def fmin(no, xstart, sigma,
         output.write('Termination by ' + str(es.stop()) + '\n')
         print('Termination by ', es.stop())
         output.write('Iterations = ' + str(iterations) + '\n')
-        print('Iterations = ', iterations)
+        print('Iterations =', iterations)
         output.write('Best f-value = ' + str(es.result[1]) + '\n')
         print('Best f-value = ', es.result[1])
         output.write('Solution = ' + str(es.result[0]) + '\n')
@@ -478,8 +494,7 @@ class CMAES(OOOptimizer):  # could also inherit from object
         xold = self.xmean  # not a copy, xmean is assigned a new later
 
         ### Sort by fitness
-        arx = [arx[k] for k in argsort(fitvals)]  # sorted arx
-        self.fitvals = sorted(fitvals)  # used for termination and display only
+        self.fitvals = fitvals  # used for termination and display only
         self.best.update(arx[0], self.fitvals[0], self.counteval)
 
         ### recombination, compute new weighted mean value
