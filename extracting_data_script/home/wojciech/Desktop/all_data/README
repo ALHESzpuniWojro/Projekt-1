@@ -1,0 +1,12 @@
+Some of the files may be uncomplete, check last lines if they contain specific keywords.
+Completeness:
+
+    - Reference:
+      5, 10, 20dim completed
+      till the 30dim, 21cec, 22cec uncompleted
+
+    - Modification:
+      5, 10dim completed (tour sizes: 2-8)
+      till the 20dim, pairs completed, 2tour 16cec, 17cec uncompleted
+                    , 3tour 19cec, 20cec uncompleted
+      till the 30dim, pairs 13cec, 14cec uncompleted, 2tour 7cec, 8cec uncompleted

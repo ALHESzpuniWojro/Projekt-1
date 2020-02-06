@@ -1,0 +1,14 @@
+evals: ax-ratio max(std)   f-value
+   20:     1.0  6.0e+00  602.5
+   40:     1.2  6.0e+00  602.5
+  260:     3.1  1.2e+01  602.5
+Starting point = [ 23.80570923 -55.43702597  53.72473993 -77.58869847 -35.58810314]
+Population size = 20
+Dimension = 5
+Tournament size = 2
+"Winners" number = 10
+CEC test function number = 20
+Termination by {'tolfun': 1e-12}
+Iterations = 13
+Best f-value = 602.5
+Solution = [27.112853734954, -52.506569832954824, 63.49975959599323, -79.94388481327083, -34.13570728324146]
